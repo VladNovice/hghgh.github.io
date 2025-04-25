@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+  <title>GigaMTI Mini App</title>
+  <style>
+    /* Сброс скролла и отступов */
+    html, body { margin:0; padding:0; height:100%; overflow:hidden; background:#000; color:#fff; font-family:Arial, sans-serif; }
+    a { color: inherit; text-decoration: none; }
+    button { border:none; cursor:pointer; font-family:inherit; }
+
+    /* Контейнеры */
+    .view { width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; position:absolute; top:0; left:0; transition: transform 0.5s ease; }
+    #view-packages { transform: translateY(100%); }
+
+    /* О нас */
+    .about { text-align:center; padding: 20px; }
+    .about h1 { margin-bottom:10px; font-size:1.8em; }
+    .about p { margin-bottom:20px; line-height:1.4; }
+    .btn-primary {
+      padding: 12px 24px;
+      background: linear-gradient(45deg, #00ff88, #8a2be2);
+      border-radius: 30px;
+      font-size:1em;
+      transition: 0.3s;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(45deg, #00cc6e, #6a2090);
+    }
+
+    /* Пакеты */
+    .packages { display: grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap:16px; padding:20px; width:100%; box-sizing:border-box; }
+    .card {
+      background:#111;
+      border-radius:12px;
+      padding:16px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      transition: 0.3s;
+    }
+    .card:hover { transform: translateY(-5px); }
+    .card h2 { margin:0 0 8px; font-size:1.4em; background: linear-gradient(45deg, #00ff88, #00e5ff); -webkit-background-clip: text; color: transparent; }
+    .card p { flex-grow:1; line-height:1.3; margin-bottom:12px; }
+    .card .price { font-size:1.2em; margin-bottom:12px; }
+    .btn-select {
+      padding:10px;
+      background: linear-gradient(45deg, #00e5ff, #8a2be2);
+      border-radius:24px;
+      transition: 0.3s;
+    }
+    .btn-select:hover {
+      background: linear-gradient(45deg, #00b8e0, #6a2090);
+    }
+
+    /* Модалка */
+    .modal-backdrop {
+      position:absolute; top:0; left:0; width:100%; height:100%;
+      background:rgba(0,0,0,0.8); display:none; align-items:center; justify-content:center;
+    }
+    .modal {
+      background:#111; border-radius:12px; padding:20px; width:90%; max-width:360px; box-sizing:border-box; position:relative;
+    }
+    .modal h3 { margin-top:0; }
+    .modal .close-btn {
+      position:absolute; top:12px; right:12px; background:transparent; font-size:1.2em; color:#fff;
+    }
+    .modal form { display:flex; flex-direction:column; gap:12px; }
+    .modal input { padding:10px; border-radius:6px; border:1px solid #333; background:#222; color:#fff; }
+    .modal .submit-btn {
+      padding:12px; border:none; border-radius:24px;
+      background: linear-gradient(45deg, #00ff88, #00e5ff);
+      transition:0.3s;
+    }
+    .modal .submit-btn:hover {
+      background: linear-gradient(45deg, #00cc6e, #00b8e0);
+    }
+
+    /* Сообщение об успехе */
+    .thanks { display:none; text-align:center; }
+
+    /* Медиазапросы */
+    @media (max-width: 480px) {
+      .about h1 { font-size:1.5em; }
+      .card h2 { font-size:1.2em; }
+    }
+  </style>
+</head>
+<body>
+  <!-- View: О нас -->
+  <div id="view-about" class="view">
+    <div class="about">
+      <!-- Логотип сюда -->
+      <!-- Здесь можно вставить <img src="logo.png" alt="GigaMTI"> -->
+      <h1>Добро пожаловать в GigaMTI</h1>
+      <p>Мы — премиальное агентство IT, дизайна и маркетинга. Создаем сайты, продвигаем бизнес в интернете и помогаем расти вашим доходам.</p>
+      <button id="btn-start" class="btn-primary">Начать</button>
+    </div>
+  </div>
+
+  <!-- View: Пакеты -->
+  <div id="view-packages" class="view">
+    <div class="packages">
+      <div class="card" data-package="Базовый">
+        <h2>Базовый</h2>
+        <p>Лендинг + базовый дизайн</p>
+        <div class="price">от 2000 ₽</div>
+        <button class="btn-select">Выбрать Базовый</button>
+      </div>
+      <div class="card" data-package="Стандарт">
+        <h2>Стандарт</h2>
+        <p>Корпоративный сайт (5–10 стр.) + SEO-настройка</p>
+        <div class="price">от 6000 ₽</div>
+        <button class="btn-select">Выбрать Стандарт</button>
+      </div>
+      <div class="card" data-package="Премиум">
+        <h2>Премиум</h2>
+        <p>Сайт + комплексный маркетинг (SMM, контекст, e-mail)</p>
+        <div class="price">от 15000 ₽</div>
+        <button class="btn-select">Выбрать Премиум</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно -->
+  <div id="modal-backdrop" class="modal-backdrop">
+    <div class="modal">
+      <button id="modal-close" class="close-btn">&times;</button>
+      <h3>Оставьте заявку</h3>
+      <form id="order-form">
+        <input type="text" name="name" placeholder="Имя" required>
+        <input type="email" name="email" placeholder="E-mail" required>
+        <input type="tel" name="phone" placeholder="Телефон" pattern="\\d+" required>
+        <input type="hidden" name="package" id="package-field">
+        <button type="submit" class="submit-btn">Отправить</button>
+      </form>
+      <div id="thanks" class="thanks">
+        <p>Спасибо! Мы свяжемся с вами в ближайшее время.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Здесь точка подключения Telegram Web Apps API
+    // window.Telegram.WebApp = ...
+
+    // Навигация между вью
+    const viewAbout = document.getElementById('view-about');
+    const viewPackages = document.getElementById('view-packages');
+    document.getElementById('btn-start').addEventListener('click', () => {
+      viewAbout.style.transform = 'translateY(-100%)';
+      viewPackages.style.transform = 'translateY(0)';
+    });
+
+    // Открытие модалки
+    document.querySelectorAll('.btn-select').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const pkg = btn.closest('.card').dataset.package;
+        document.getElementById('package-field').value = pkg;
+        document.getElementById('modal-backdrop').style.display = 'flex';
+      });
+    });
+    document.getElementById('modal-close').addEventListener('click', () => {
+      document.getElementById('modal-backdrop').style.display = 'none';
+      resetModal();
+    });
+
+    // Валидация и эмуляция отправки
+    const form = document.getElementById('order-form');
+    const thanks = document.getElementById('thanks');
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+      // Эмуляция отправки
+      form.style.display = 'none';
+      thanks.style.display = 'block';
+      setTimeout(() => {
+        resetModal();
+        document.getElementById('modal-backdrop').style.display = 'none';
+      }, 3000);
+    });
+
+    function resetModal() {
+      form.reset();
+      form.style.display = 'flex';
+      thanks.style.display = 'none';
+    }
+  </script>
+</body>
+</html>
